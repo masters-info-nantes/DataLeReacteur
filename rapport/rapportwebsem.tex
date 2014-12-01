@@ -1,0 +1,139 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[frenchb]{babel}
+\usepackage{graphicx}
+\usepackage[colorlinks=true,linkcolor=blue,urlcolor=blue,urlbordercolor={1 1 1}]{hyperref}
+\usepackage{multicol}
+\usepackage[rflt]{floatflt}
+\usepackage{colortbl}
+
+\title{Sémantisation des données du site LeReacteur}
+\author{Anthony Pena, Jérémy Bardon, Nicolas Brondin}
+\date{}
+	
+\begin{document}
+	\renewcommand{\contentsname}{Sommaire}
+
+	\maketitle
+
+	\newpage
+	\tableofcontents
+	\newpage
+	
+	\section{Introduction}
+	Le site internet \href{http://lereacteur.info}{leReacteur} regroupe des informations sur des expositions de tout types : vernissage, projection ou encore performance. Il s'agit d'un site de crowdsourcing qui regroupe les événements de plusieurs villes de France ajoutés par les utilisateurs.
+	
+	\section{Données disponibles}	
+	Les informations visibles sur le sites sont toutes enregistrées dans une base de données SQL qui répartie les données sur 3 tables : expositions, lieux et images. 
+	
+	Un CMS étant utilisé, certaines informations ne sont pas directement liées aux expositions mais plutôt à la gestion interne du site. C'est pourquoi nous avons du comprendre le sens de chaque champ afin de n'extraire que les données qui sont intéressantes.
+	
+	\begin{center}
+	\begin{tabular}{|l|l|l|}
+		\hline
+		\multicolumn{3}{|c|}{Ensemble des données} \\
+		\hline
+		Exposition & Lieu & Image \\
+		\hline
+		Nom & Nom & Nom \\
+		Description & Catégorie &\\
+		Image & Position (latitude) &\\
+		Catégorie & Position (longitude) &\\
+		Artistes & Horaires &\\
+		Lieu & Adresse (rue) &\\
+		Site web & Ville &\\
+		Festival & Site web &\\
+		Date &&\\    		
+		\hline
+	\end{tabular}
+	\end{center}
+	
+	Pour extraire les données de la base nous avons choisi avec l'administratrice du site d'utiliser des vues afin que l'opération soit simplifiée avec l'outil de gestion phpMyAdmin\footnote{Outil de gestion de base de données grand public disponible à \href{http://www.phpmyadmin.net/home_page/index.php}{cette adresse}} qu'elle utilise quotidiennement.
+	
+	\section{Sémantisation}	
+	Afin de donner du sens aux données nous avons cherché du vocabulaire à l'aide du projet \href{http://lov.okfn.org/dataset/lov/}{lov} ce qui nous a conduit à utiliser en grande partie celui mis à disposition sur \href{http://schema.org}{schema.org}. 
+	
+	Ce contributeur ne faisant pas l'unanimité au sein de la communauté notre choix c'est ensuite porté sur du vocabulaire un plus générique et largement utilisé afin qu'il soit facilement identifiable par ceux qui voudraient accéder à nos données.
+	
+	\paragraph{Vocabulaire utilisé}
+	\begin{center}
+	%\begin{multicols}{2}
+	\begin{tabular}{|l|>{\columncolor[gray]{0.9}}l|l|>{\columncolor[gray]{0.9}}l|l|>{\columncolor[gray]{0.9}}l|l|}
+		\hline
+    	Exposition & dc:Event\\
+    	\hline
+		Nom           & foaf:name\\
+		Description   & dc:description\\
+		Image         & foaf:img\\
+		Catégorie     & dc:type\\
+		Artistes      & dc:contributor\\
+		Lieu          & gc:locatedIn\\
+		Site web      & foaf:homepage\\
+		Festival      & dc:hasPart\\
+		Date          & dc:date\\    		
+		\hline
+	\end{tabular}
+	
+	\vspace*{12px}
+	
+	\begin{tabular}{|l|>{\columncolor[gray]{0.9}}l|l|>{\columncolor[gray]{0.9}}l|l|>{\columncolor[gray]{0.9}}l|l|}
+		\hline
+		Image & foaf:Image \\
+		\hline
+		Nom & foaf:name \\
+		Description & dc:description \\
+		\hline
+	\end{tabular}
+	
+	%\end{multicols}
+	\vspace*{12px}
+	
+	\begin{tabular}{|l|>{\columncolor[gray]{0.9}}l|l|>{\columncolor[gray]{0.9}}l|l|>{\columncolor[gray]{0.9}}l|l|}
+		\hline
+    	Lieu & dc:Location\\
+    	\hline
+		Nom                  & foaf:name\\
+		Catégorie            & dc:type\\
+		Position (latitude)  & geo:lat\\
+		Position (longitude) & geo:long \\
+		Horaires             & dc:hasOpeningHoursSpecification\\
+		Adresse (rue)        & vcard:street-address\\
+		Ville                & vcard:locatity\\
+		Site web             & foaf:homepage\\
+		\hline
+	\end{tabular}
+	
+	\end{center}
+	
+	\section{Extraction des données}	
+	Afin d'extraire les données de la base phpMyAdmin, nous avons choisi de créer une vue qui regroupe ce que nous voulons extraire pour ensuite pouvoir utiliser l'extraction en xml par défaut. 
+	
+	
+	Ensuite, pour ajouter nos données dans \href{http://lodpaddle.univ-nantes.fr/lodpaddle}{LodPaddle} nous avons dû utiliser l'openDataWrapper\footnote{Wrapper de l'université de Nantes disponible sur GitHub à \href{http://github.com/masterALMA2016/openDataWrapper}{cette adresse}} qui demande une structuration particulière du fichier xml pour l'importation de datasets. Dans le but de palier à ce problème, nous avons développer une petite application qui fait la conversion. Une fois ce fichier entré dans le wrapper, nous avons obtenu les données au format turtle et RDF.
+	
+	\section{Liaisons possibles}
+	\subsection{Localisation}
+	Nous avons à disposition le lieu de chaque événement avec sa position géographique précise ainsi que ces horaires d'ouverture. 
+	
+On peut imaginer regrouper d'avantage d'informations à propos de ces lieux ou encore afficher d'autres types de lieux (restaurants, monuments, etc.) à proximité et même, en fonction des horaires proposer une sorte d'emploi du temps pour la journée.
+	\subsection{Artistes}
+	La liste des artistes est associée à chaque exposition ce qui laisse penser que l'on peut retrouver des informations plus précises sur chacun d'eux par exemple sur \href{http://dbpedia.org}{DBpedia}. Avec ces nouvelles données il est alors possible de montrer d'autres oeuvres ou encore de proposer des événements regroupant des artistes ayant un style proche de ceux présents à l'exposition.
+	
+	\section{Avancée du projet}
+	\subsection{Fini}
+		\begin{itemize}		
+			\item{Sélection des données}
+			\item{Choix du vocabulaire}
+			\item{Export à partir de phpMyAdmin}
+			\item{Formatage en xml spécial wrapper}
+			\item{Import du dataset dans le wrapper}
+			\item{Conversion au format turtle}
+		\end{itemize}
+	\subsection{Reste à faire}
+		\begin{itemize}
+			\item{Conversion au format RDF}
+			\item{Linkage du dataset avec ceux des autres groupes}
+			\item{Utilisation des ontologies RDFS/OWL}
+		\end{itemize}
+\end{document}

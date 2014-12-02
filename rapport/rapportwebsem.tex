@@ -107,10 +107,10 @@
 	\end{center}
 	
 	\section{Extraction des données}	
-	Afin d'extraire les données de la base phpMyAdmin, nous avons choisi de créer une vue qui regroupe ce que nous voulons extraire pour ensuite pouvoir utiliser l'extraction en xml par défaut. 
+	Afin d'extraire les données de la base phpMyAdmin, nous avons choisi de créer une \href{http://github.com/masterALMA2016/DataLeReacteur/blob/master/extract/views.sql}{vue} qui regroupe ce que nous voulons extraire pour ensuite pouvoir utiliser l'extraction en xml par défaut. 
 	
 	
-	Ensuite, pour ajouter nos données dans \href{http://lodpaddle.univ-nantes.fr/lodpaddle}{LodPaddle} nous avons dû utiliser l'openDataWrapper\footnote{Wrapper de l'université de Nantes disponible sur GitHub à \href{http://github.com/masterALMA2016/openDataWrapper}{cette adresse}} qui demande une structuration particulière du fichier xml pour l'importation de datasets. Dans le but de palier à ce problème, nous avons développer une petite application qui fait la conversion. Une fois ce fichier entré dans le wrapper, nous avons obtenu les données au format turtle et RDF.
+	Ensuite, pour ajouter nos données dans \href{http://lodpaddle.univ-nantes.fr/lodpaddle}{LodPaddle} nous avons dû utiliser l'openDataWrapper\footnote{Wrapper de l'université de Nantes disponible sur GitHub à \href{http://github.com/masterALMA2016/openDataWrapper}{cette adresse}} qui demande une structuration particulière du fichier xml pour l'importation de datasets. Dans le but de palier à ce problème, nous avons développé un \href{http://github.com/masterALMA2016/DataLeReacteur/blob/master/extract/Pma2xml.java}{programme} qui fait la conversion. Une fois ce fichier entré dans le wrapper, nous avons obtenu les données au format turtle et RDF.
 	
 	\section{Liaisons possibles}
 	\subsection{Localisation}

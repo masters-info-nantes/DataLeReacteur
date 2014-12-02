@@ -55,27 +55,24 @@ public class Pma2xml {
 		
 		pattern = Pattern.compile("\n\\s*<!--(.*)-->");
 		fileContent = pattern.matcher(fileContent).replaceAll("");
+
+		pattern = Pattern.compile("<column name=\"(.*)\">\n?(.*)</column>");
+		fileContent = pattern.matcher(fileContent).replaceAll("<$1>$2</$1>");
 		
-		pattern = Pattern.compile("<(/)?pma_xml_export(.*)?>(\n)?");
-		fileContent = pattern.matcher(fileContent).replaceAll("<$1document>$2");
+		pattern = Pattern.compile("<(/)?table.*>");
+		fileContent = pattern.matcher(fileContent).replaceAll("<$1element>");
 		
-		pattern = Pattern.compile("<(/)?database(.*)?>(\n)?");
-		fileContent = pattern.matcher(fileContent).replaceAll("<$1data>$2");
+		pattern = Pattern.compile("<(/)?database.*>");
+		fileContent = pattern.matcher(fileContent).replaceAll("<$1data>");
 		
-		pattern = Pattern.compile("<(/)?table(.*)?>(\n)?");
-		fileContent = pattern.matcher(fileContent).replaceAll("<$1element>$2");
-		
-		pattern = Pattern.compile("<column name=\"(.*)\">(\n)?(.*)</column>");
-		fileContent = pattern.matcher(fileContent).replaceAll("<$1>$3</$1>");
+		pattern = Pattern.compile("<(/)?pma_xml_export.*>");
+		fileContent = pattern.matcher(fileContent).replaceAll("<$1document>");
 		
 		pattern = Pattern.compile(">(\n*\\s*)*<");
 		fileContent = pattern.matcher(fileContent).replaceAll("><");
-		
+
 		pattern = Pattern.compile("\\s+");
 		fileContent = pattern.matcher(fileContent).replaceAll(" ");
-		
-		//~ pattern = Pattern.compile("\n");
-		//~ fileContent = pattern.matcher(fileContent).replaceAll("");
 		
 		return fileContent;
 	}

@@ -7,3 +7,4 @@ Repository organisation
 -----------------
 - extract : tools to extract data from LeReacteur
 - rapport : project report and documentation
+- presentations : slides

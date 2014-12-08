@@ -74,6 +74,18 @@ public class Pma2xml {
 		pattern = Pattern.compile("\\s+");
 		fileContent = pattern.matcher(fileContent).replaceAll(" ");
 		
+		pattern = Pattern.compile("&quot;");
+		fileContent = pattern.matcher(fileContent).replaceAll("\"");
+		
+		pattern = Pattern.compile("&lt;");
+		fileContent = pattern.matcher(fileContent).replaceAll("<");
+		
+		pattern = Pattern.compile("&gt;");
+		fileContent = pattern.matcher(fileContent).replaceAll(">");
+		
+		pattern = Pattern.compile("&amp;");
+		fileContent = pattern.matcher(fileContent).replaceAll("&");
+		
 		return fileContent;
 	}
 	

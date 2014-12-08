@@ -3,10 +3,11 @@
 \usepackage[T1]{fontenc}
 \usepackage[frenchb]{babel}
 \usepackage{graphicx}
-\usepackage[colorlinks=true,linkcolor=blue,urlcolor=blue,urlbordercolor={1 1 1}]{hyperref}
+\usepackage[colorlinks=true,linkcolor=black,urlcolor=black,urlbordercolor={1 1 1}]{hyperref}
 \usepackage{multicol}
 \usepackage[rflt]{floatflt}
 \usepackage{colortbl}
+\usepackage{listings}
 
 \title{Sémantisation des données du site LeReacteur}
 \author{Anthony Pena, Jérémy Bardon, Nicolas Brondin}
@@ -58,7 +59,6 @@
 	
 	\paragraph{Vocabulaire utilisé}
 	\begin{center}
-	%\begin{multicols}{2}
 	\begin{tabular}{|l|>{\columncolor[gray]{0.9}}l|l|>{\columncolor[gray]{0.9}}l|l|>{\columncolor[gray]{0.9}}l|l|}
 		\hline
     	Exposition & dc:Event\\
@@ -84,7 +84,6 @@
 		\hline
 	\end{tabular}
 	
-	%\end{multicols}
 	\vspace*{12px}
 	
 	\begin{tabular}{|l|>{\columncolor[gray]{0.9}}l|l|>{\columncolor[gray]{0.9}}l|l|>{\columncolor[gray]{0.9}}l|l|}
@@ -108,7 +107,33 @@
 	Afin d'extraire les données de la base phpMyAdmin, nous avons choisi de créer une \href{http://github.com/masterALMA2016/DataLeReacteur/blob/master/extract/views.sql}{vue} qui regroupe ce que nous voulons extraire pour ensuite pouvoir utiliser l'extraction en xml par défaut. 
 	
 	
-	Ensuite, pour ajouter nos données dans \href{http://lodpaddle.univ-nantes.fr/lodpaddle}{LodPaddle} nous avons dû utiliser l'openDataWrapper\footnote{Wrapper de l'université de Nantes disponible sur GitHub à \href{http://github.com/masterALMA2016/openDataWrapper}{cette adresse}} qui demande une structuration particulière du fichier xml pour l'importation de datasets. Dans le but de palier à ce problème, nous avons développé un \href{http://github.com/masterALMA2016/DataLeReacteur/blob/master/extract/Pma2xml.java}{programme} qui fait la conversion. Une fois ce fichier entré dans le wrapper, nous avons obtenu les données au format turtle et RDF.
+	Ensuite, pour ajouter nos données dans \href{http://lodpaddle.univ-nantes.fr/lodpaddle}{LodPaddle} nous avons dû utiliser l'openDataWrapper\footnote{Wrapper de l'université de Nantes disponible sur GitHub à \href{http://github.com/masterALMA2016/openDataWrapper}{cette adresse}} qui demande une structuration particulière du fichier xml pour l'importation de datasets. Dans le but de palier à ce problème, nous avons développé un \href{http://github.com/masterALMA2016/DataLeReacteur/blob/master/extract/Pma2xml.java}{programme} qui fait la conversion. 
+	
+	\begin{lstlisting}[frame=single,caption=Export phpMyAdmin]
+<pma_xml_export version="1.0">
+  <database name="reacteur">
+    <table name="opendata_nantes">
+      <column name="e_name">Le paraphile</column>
+	  ...
+	</table>
+    ...
+  </database>
+</pma_xml_export>
+	\end{lstlisting}
+	
+	\begin{lstlisting}[frame=single,caption=Format du  wrapper]
+<document>
+  <data>
+    <element>
+	  <e_name>Le paraphile</e_name>
+	  ...
+	</element>
+	...
+  </data>
+</document>
+	\end{lstlisting}
+	
+Une fois ce fichier entré dans le wrapper, nous avons obtenu les données au format turtle et RDF.
 	
 	\section{Liaisons possibles}
 	\subsection{Localisation}
@@ -120,42 +145,47 @@ On peut imaginer regrouper d'avantage d'informations à propos de ces lieux ou e
     
     \section{Requêtes SPARQL}
     
-    \subsection{Requête 1}
-    Requête qui sélectionne tous les évènements se passant le 1er Janvier 2014.
-    \begin{verbatim}
-    PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-    PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-    PREFIX dc: <http://purl.org/dc/elements/1.1/>
+    \subsection{Événements du 01/01/2014}
+    Requête qui sélectionne l'ensemble de tous les évènements qui se passent le $1^{er}$ Janvier 2014.
+    
+%PREFIX xsd:<http://www.w3.org/2001/XMLSchema#>
+%PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>
+%PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+%PREFIX dc:<http://purl.org/dc/elements/1.1/>
 
-    SELECT ?name
-    WHERE
-    {
-        ?event    rdf:type    dc:Event;
-                dc:date        ?date;
-                foaf:name    ?name.
-        filter(?date = "2014-01-01"^^xsd:date)
-    }
-    \end{verbatim}
+	\begin{lstlisting}[frame=single]
+SELECT ?name
+WHERE
+{
+  ?event  rdf:type   dc:Event;
+          dc:date    ?date;
+          foaf:name  ?name.
+  filter(?date = "2014-01-01"^^xsd:date)
+}
+    \end{lstlisting}
 	
-    \subsection{Requête 2}
-    Requête qui sélectionne toutes les expositions à Nantes de Nathalie Lamotte.
-    \begin{verbatim}
-    PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>
-    PREFIX foaf: <http://xmlns.com/foaf/0.1/>
-    PREFIX dc: <http://purl.org/dc/elements/1.1/>
+    \subsection{Expositions auxquelles participe un artiste}
+    Requête qui sélectionne l'ensemble de toutes les expositions à Nantes auxquelles Nathalie Lamotte participe.
+    
+%PREFIX vcard:<http://www.w3.org/2006/vcard/ns#>
+%PREFIX foaf:<http://xmlns.com/foaf/0.1/>
+%PREFIX dc:<http://purl.org/dc/elements/1.1/>
 
-    SELECT ?name , ?date
-    WHERE
-    {
-        ?event    dc:contributor    ?author;
-                    dc:date            ?date;
-                    foaf:name        ?name;
-            dc:Location    ?location.
-       ?location vcard:locality    ?city.
-        filter(?city = <http://dbpedia.org/resource/Nantes> and ?author = "Nathalie Lamotte" )
-    }    
-    \end{verbatim
+	\begin{lstlisting}[frame=single]
+SELECT ?name , ?date
+WHERE
+{
+  ?event    dc:contributor   ?author;
+            dc:date          ?date;
+            foaf:name        ?name;
+            dc:Location      ?location.
+  ?location vcard:locality   ?city.
+  filter(
+     ?city = <http://dbpedia.org/resource/Nantes> 
+     and ?author = "Nathalie Lamotte"
+  )
+}    
+    \end{lstlisting}
     
 	\section{Avancée du projet}
 	\subsection{Fini}

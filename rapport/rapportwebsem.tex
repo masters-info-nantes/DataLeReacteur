@@ -25,9 +25,9 @@
 	Le site internet \href{http://lereacteur.info}{leReacteur} regroupe des informations sur des expositions de tout types : vernissage, projection ou encore performance. Il s'agit d'un site de crowdsourcing qui regroupe les événements de plusieurs villes de France ajoutés par les utilisateurs.
 	
 	\section{Données disponibles}	
-	Les informations visibles sur le sites sont toutes enregistrées dans une base de données SQL qui répartie les données sur 3 tables : expositions, lieux et images. 
+	Les informations visibles sur le site sont toutes enregistrées dans une base de données SQL qui répartie les données sur 3 tables : expositions, lieux et images. 
 	
-	Un CMS étant utilisé, certaines informations ne sont pas directement liées aux expositions mais plutôt à la gestion interne du site. C'est pourquoi nous avons du comprendre le sens de chaque champ afin de n'extraire que les données qui sont intéressantes.
+	Un CMS étant utilisé, certaines informations ne sont pas directement liées aux expositions mais plutôt à la gestion interne du site. C'est pourquoi nous avons dû comprendre le sens de chaque champ afin de n'extraire que les données qui sont intéressantes.
 	
 	\begin{center}
 	\begin{tabular}{|l|l|l|}
@@ -52,9 +52,9 @@
 	Pour extraire les données de la base nous avons choisi avec l'administratrice du site d'utiliser des vues afin que l'opération soit simplifiée avec l'outil de gestion phpMyAdmin\footnote{Outil de gestion de base de données grand public disponible à \href{http://www.phpmyadmin.net/home_page/index.php}{cette adresse}} qu'elle utilise quotidiennement.
 	
 	\section{Sémantisation}	
-	Afin de donner du sens aux données nous avons cherché du vocabulaire à l'aide du projet \href{http://lov.okfn.org/dataset/lov/}{lov} ce qui nous a conduit à utiliser en grande partie celui mis à disposition sur \href{http://schema.org}{schema.org}. 
+	Afin de donner du sens aux données nous avons cherché du vocabulaire à l'aide du projet \href{http://lov.okfn.org/dataset/lov/}{lov} qui nous a conseillé d'utiliser en grande partie celui mis à disposition sur \href{http://schema.org}{schema.org}. 
 	
-	Ce contributeur ne faisant pas l'unanimité au sein de la communauté notre choix c'est ensuite porté sur du vocabulaire un plus générique et largement utilisé afin qu'il soit facilement identifiable par ceux qui voudraient accéder à nos données.
+	Ce contributeur ne faisant pas l'unanimité au sein de la communauté notre choix c'est ensuite porté sur du vocabulaire plus générique et largement utilisé afin qu'il soit facilement identifiable par ceux qui voudraient utiliser nos données.
 	
 	\paragraph{Vocabulaire utilisé}
 	\begin{center}
@@ -117,7 +117,46 @@
 On peut imaginer regrouper d'avantage d'informations à propos de ces lieux ou encore afficher d'autres types de lieux (restaurants, monuments, etc.) à proximité et même, en fonction des horaires proposer une sorte d'emploi du temps pour la journée.
 	\subsection{Artistes}
 	La liste des artistes est associée à chaque exposition ce qui laisse penser que l'on peut retrouver des informations plus précises sur chacun d'eux par exemple sur \href{http://dbpedia.org}{DBpedia}. Avec ces nouvelles données il est alors possible de montrer d'autres oeuvres ou encore de proposer des événements regroupant des artistes ayant un style proche de ceux présents à l'exposition.
+    
+    \section{Requêtes SPARQL}
+    
+    \subsection{Requête 1}
+    Requête qui sélectionne tous les évènements se passant le 1er Janvier 2014.
+    \begin{verbatim}
+    PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+    PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+    PREFIX dc: <http://purl.org/dc/elements/1.1/>
+
+    SELECT ?name
+    WHERE
+    {
+        ?event    rdf:type    dc:Event;
+                dc:date        ?date;
+                foaf:name    ?name.
+        filter(?date = "2014-01-01"^^xsd:date)
+    }
+    \end{verbatim}
 	
+    \subsection{Requête 2}
+    Requête qui sélectionne toutes les expositions à Nantes de Nathalie Lamotte.
+    \begin{verbatim}
+    PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>
+    PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+    PREFIX dc: <http://purl.org/dc/elements/1.1/>
+
+    SELECT ?name , ?date
+    WHERE
+    {
+        ?event    dc:contributor    ?author;
+                    dc:date            ?date;
+                    foaf:name        ?name;
+            dc:Location    ?location.
+       ?location vcard:locality    ?city.
+        filter(?city = <http://dbpedia.org/resource/Nantes> and ?author = "Nathalie Lamotte" )
+    }    
+    \end{verbatim
+    
 	\section{Avancée du projet}
 	\subsection{Fini}
 		\begin{itemize}		
@@ -126,6 +165,7 @@ On peut imaginer regrouper d'avantage d'informations à propos de ces lieux ou e
 			\item{Export à partir de phpMyAdmin}
 			\item{Formatage en xml spécial wrapper}
 			\item{Import du dataset dans le wrapper}
+            \item{Remplissage du fichier de mapping}
 			\item{Conversion au format turtle}
 		\end{itemize}
 	\subsection{Reste à faire}
